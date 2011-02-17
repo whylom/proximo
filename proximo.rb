@@ -7,16 +7,28 @@
 #       - local.alias.com
 #       - other.local.alias.com
 #     docroot: C:\local\static\files
-#     remote_host: www.domain.com
+#     proxy: www.domain.com
 #     always_from_remote:
 #       - /filename.html
 #       - leading/slash/is-optional.css
 #       - /can/use/*/wildcards/*.jsp
+#
+# can also override remote host on a per-request basis
+#
+#   local.domain.com:
+#     docroot: C:\local\static\files
+#     proxy:
+#       default: www.domain.com
+#       others:
+#         - for: /javascripts/*
+#           use: localhost:3000
 
 require 'net/http'
 require 'rubygems'
 require 'sinatra'
 require 'yaml'
+require 'uri'
+
 
 
 # listen on default HTTP port, so simple hostnames can be used
@@ -24,6 +36,9 @@ set :port, 80
 
 # do not automatically serve local files (all requests go through get/post handlers)
 set :static, false
+
+# this proxy gets seriously wacky running on Thin, so restrict server choices to Mongrel and WEBrick
+set :server, %w[mongrel webrick]
 
 
 
@@ -39,15 +54,21 @@ before do
   fail "Docroot '#{docroot}' does not exist." if !File.exists?(docroot)
   set :public, docroot
 
-  @remote_host = @settings['remote_host']
-  #fail "remote_host not defined for hostname '#{host}'." if @remote_host.nil?
-
   # if the requested path ends in a slash, and an index.html is available in a local 
   # folder with that name, explicitly append 'index.html' to the path
   # otherwise, it is fetched from remote server (which routes to index.html, index.jsp, etc.)
   path = request.path_info  
   path << 'index.html' if ends_with_slash?(path) && exists_locally?(path + 'index.html')
   @path = path
+
+  # set remote_host (possibly based on path requested)
+  proxy = @settings['proxy']
+  if proxy.is_a?(Hash)
+    other = proxy['other'].find { |i| i['for'] == path }
+    @remote_host = other.nil? ? proxy['default'] : other['use']
+  else
+    @remote_host = proxy
+  end
 end
 
 # delegate all GET/POST requests to custom handlers
@@ -89,9 +110,10 @@ def serve_local
 end
 
 def serve_remote
-  http = Net::HTTP.new(@remote_host)
+  url = URI.parse("http://#{@remote_host}")
+  http = Net::HTTP.new(url.host, url.port)
   path = @path + '?' + request.query_string
-
+  
   # forward incoming GET/POST requests to remote host and capture response
   if request.get?
     remote = http.get(path, custom_headers)
