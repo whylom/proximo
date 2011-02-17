@@ -1,0 +1,7 @@
+local.bbcamericashop.com:
+  aliases:
+    - local.bbccanadashop.com
+  docroot: C:\webroot\bbcs\www
+  remote_host: test.bbcamericashop.com
+  always_from_remote:
+    - *.jsp
