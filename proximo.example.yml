@@ -5,11 +5,7 @@ local.bbcamericashop.com:
   always_from_remote:
     - *.jsp
   proxy: test.bbcamericashop.com
-  
-#  can also use this format:
-#
-#  proxy:
-#    default: test.bbcamericashop.com
-#    other:
-#      - for: /javascripts/*
-#        use: localhost:3000
+    default: test.bbcamericashop.com
+    others:
+      - for: /javascripts/*
+        use: localhost:3000

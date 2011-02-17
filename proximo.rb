@@ -64,7 +64,7 @@ before do
   # set remote_host (possibly based on path requested)
   proxy = @settings['proxy']
   if proxy.is_a?(Hash)
-    other = proxy['other'].find { |i| i['for'] == path }
+    other = proxy['others'].find { |i| i['for'] == path }
     @remote_host = other.nil? ? proxy['default'] : other['use']
   else
     @remote_host = proxy
