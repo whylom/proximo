@@ -61,13 +61,21 @@ before do
   path << 'index.html' if ends_with_slash?(path) && exists_locally?(path + 'index.html')
   @path = path
 
-  # set remote_host (possibly based on path requested)
+  # set remote_host based on proxy settings
   proxy = @settings['proxy']
-  if proxy.is_a?(Hash)
-    other = proxy['others'].find { |i| i['for'] == path }
-    @remote_host = other.nil? ? proxy['default'] : other['use']
-  else
+  if proxy.is_a?(String)
+    # Style #1
+    #   proxy: foo.com
     @remote_host = proxy
+  elsif proxy.is_a?(Hash)
+    # Style #2
+    #   proxy:
+    #     default: foo.com
+    #     others:
+    #       - for: /images/*
+    #         use: bar.com
+    other = proxy['others'].find { |other| to_regexp(other['for']) =~ path }
+    @remote_host = other.nil? ? proxy['default'] : other['use']
   end
 end
 
