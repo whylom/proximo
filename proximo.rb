@@ -142,6 +142,7 @@ def custom_headers
   headers = {}  
   headers['Cookie'] = @env['HTTP_COOKIE'] if !request.cookies.empty?
   headers['Content-Type'] = request.content_type if request.post?
+  headers['User-Agent'] = request.user_agent
   headers['Referer'] = @env['HTTP_REFERER'] if @env.has_key?('HTTP_REFERER')
   headers
 end
