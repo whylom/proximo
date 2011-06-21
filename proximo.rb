@@ -26,6 +26,7 @@
 require 'net/http'
 require 'rubygems'
 require 'sinatra'
+require 'sinatra/reloader'
 require 'yaml'
 require 'uri'
 
@@ -45,6 +46,7 @@ set :server, %w[mongrel webrick]
 # read from settings file before handling each request (no restarts required)
 before do
   host = request.host
+  @host = host
   @settings = settings_for(host)
   fail "Settings not defined for hostname '#{host}'." if @settings.nil?
 
@@ -133,6 +135,10 @@ def serve_remote
   status remote.code
   content_type remote['content-type']
   response['Set-Cookie'] = remote['Set-Cookie'] if !remote['Set-Cookie'].nil?
+  
+  # if present, rewrite redirect URL to use local hostname (instead of remote hostname)
+  url = remote['Location']
+  response['Location'] = url.gsub(@remote_host, @host) if !url.nil?
 
   # return body of remote host's response (to be served by get/post handlers)
   remote.body
