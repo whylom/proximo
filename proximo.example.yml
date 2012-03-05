@@ -1,17 +1,18 @@
-local.msginsider.com:
-  docroot: C:\webroot\msginsider\www
+local.foo.com:
+  docroot: ~/apps/foo
   always_from_remote:
     - *.jsp
-  proxy: dev.msginsider.com
+  proxy: www.foo.com
 
-local.bbcamericashop.com:
+local.bar.com:
   aliases:
-    - local.bbccanadashop.com
-  docroot: C:\webroot\bbcs\www
+    - local.baz.com
+  docroot: ~/apps/bar
   always_from_remote:
-    - *.jsp
+    - *.xml
+    - *.php
   proxy: 
-    default: test.bbcamericashop.com
+    default: www.bar.com
     others:
       - for: /javascripts/*
         use: localhost:3000
