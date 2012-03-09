@@ -20,6 +20,40 @@ Proximo makes this situation far more tolerable by letting you work locally with
 4. Start server with `sudo ruby proximo.rb`
 
 
+## Configuration ##
+
+This is a minimal configuration. Requests directed to local.foo.com (mapped to 127.0.0.1 in your hosts file) will use this configuration. The server attempts to serve the requested file from the docroot.  If not found, it forwards the request to the remote server.
+
+```yaml
+local.foo.com:
+  docroot: ~/apps/foo
+  proxy: www.foo.com
+```
+
+You can also specify that certain requests should always be forwarded to the remote server, even if they exist in the docroot. This is useful for JSP, ASP, PHP files that you cannot be served dynamically from your machine.
+
+```yaml
+local.foo.com:
+  docroot: ~/apps/foo
+  proxy: www.foo.com
+  always_from_remote:
+    - /time
+    - *.php
+```
+
+If you are unforunate enough to need to forward requests to multiple remote hosts (we were) you can use this alternative format for specifying the remotes:
+
+```yaml
+local.foo.com:
+  docroot: ~/apps/foo
+  proxy: www.foo.com
+  proxy: 
+    default: www.foo.com
+    others:
+      - for: /articles/*
+        use: localhost:3000
+```
+
 ## Roadmap ##
 
 This app was a quick hack that solved a real-life problem and saved lives.  But I'm not happy with the central configuration file, and the need to hack on your hosts file.  Here's what I'd like to improve:
