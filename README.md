@@ -46,7 +46,6 @@ If you are unforunate enough to need to forward requests to multiple remote host
 ```yaml
 local.foo.com:
   docroot: ~/apps/foo
-  proxy: www.foo.com
   proxy: 
     default: www.foo.com
     others:
@@ -61,3 +60,4 @@ This app was a quick hack that solved a real-life problem and saved lives.  But 
 - Package as a gem, with a `proximo` binary that accepts basic configuration (port, remote host, etc.) as command-line arguments.
 - Allow more complex configuration to be versioned in a `.proximo` file that is automatically picked up by the Proximo binary.
 - Refactor proxy to forward *all* HTTP headers automatically.
+- Refactor to use Rack instead of Sinatra.
