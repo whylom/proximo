@@ -41,7 +41,7 @@ local.foo.com:
     - *.php
 ```
 
-If you are unforunate enough to need to forward requests to multiple remote hosts (we were) you can use this alternative format for specifying the remotes:
+If you are unfortunate enough to need to forward requests to multiple remote hosts (we were) you can use this alternative format for specifying the remotes:
 
 ```yaml
 local.foo.com:
